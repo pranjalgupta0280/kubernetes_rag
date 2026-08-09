@@ -1,0 +1,49 @@
+# Environment variables & secrets
+.env
+.env.*
+*.env
+
+# Python Virtual Environments
+.venv
+.venv/
+.venv/**
+venv/
+env/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+*.manifest
+*.spec
+
+# Logs & Telemetry
+.logfire
+.logfire/
+.logfire/**
+*.log
+logs/
+
+# Scratch & Temporary files
+scratch/
+scratch/**
+
+# Data & Output cache
+processed_data/
+processed_data/**
+*.sqlite
+*.db
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
