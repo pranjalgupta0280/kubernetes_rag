@@ -84,13 +84,26 @@ if prompt := st.chat_input("Ask about your documentation..."):
                     with logfire.span("📡 Calling RAG Backend"):
                         url = f"{base_url}/query"
                         payload = {"q": prompt, "thread_id": st.session_state.session_id}
-                        response = requests.post(url, json=payload, timeout=60)
-
-                        if response.status_code != 200:
-                            st.error(f"Backend Error: {response.status_code} - {response.text}")
-                            st.stop()
-
-                        data = response.json()
+                        
+                        max_retries = 3
+                        for attempt in range(max_retries):
+                            try:
+                                response = requests.post(url, json=payload, timeout=90)
+                                if response.status_code == 200:
+                                    data = response.json()
+                                    break
+                                elif response.status_code in (502, 503, 504) and attempt < max_retries - 1:
+                                    st.write(f"⚡ Backend is waking up from idle (Render cold start)... Retrying ({attempt+1}/{max_retries})...")
+                                    time.sleep(12)
+                                else:
+                                    st.error(f"Backend Error: {response.status_code} - {response.text[:300]}")
+                                    st.stop()
+                            except Exception as req_err:
+                                if attempt < max_retries - 1:
+                                    st.write("⚡ Waking backend server... Retrying in 10s...")
+                                    time.sleep(10)
+                                else:
+                                    raise req_err
 
                     steps = data.get("thought_process", [])
                     for step in steps:
