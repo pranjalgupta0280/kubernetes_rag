@@ -29,9 +29,13 @@ def _probe_gemini():
 
 
 def _load_fallback():
-    from sentence_transformers import SentenceTransformer
-    logfire.info("Loading sentence-transformers fallback (all-mpnet-base-v2, 768-dim).")
-    return SentenceTransformer("all-mpnet-base-v2")
+    try:
+        from sentence_transformers import SentenceTransformer
+        logfire.info("Loading sentence-transformers fallback (all-mpnet-base-v2, 768-dim).")
+        return SentenceTransformer("all-mpnet-base-v2")
+    except ImportError:
+        logfire.error("sentence-transformers not installed. Ensure GEMINI_API_KEY is configured.")
+        raise RuntimeError("Embeddings initialization failed: GEMINI_API_KEY missing or invalid.")
 
 
 def _init():
