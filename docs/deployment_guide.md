@@ -38,7 +38,7 @@ git push origin main
    - **Branch**: `main`
    - **Build Command**: 
      ```bash
-     pip install --upgrade pip && pip install -r requirements.txt
+     pip install --upgrade pip setuptools wheel && pip install --prefer-binary -r requirements.txt
      ```
    - **Start Command**: 
      ```bash
