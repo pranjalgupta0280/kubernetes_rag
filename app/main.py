@@ -16,7 +16,15 @@ if hasattr(sys.stdout, "reconfigure"):
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 
 load_dotenv()
-logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
+
+logfire_token = os.getenv("LOGFIRE_TOKEN")
+try:
+    if logfire_token:
+        logfire.configure(token=logfire_token)
+    else:
+        logfire.configure(send_to_logfire=False)
+except Exception as e:
+    print(f"Logfire init warning: {e}")
 
 # Now safe to import app modules - logfire is already active
 from fastapi import FastAPI, Response
