@@ -42,7 +42,7 @@ git push origin main
      ```
    - **Start Command**: 
      ```bash
-     uvicorn app.main:app --host 0.0.0.0 --port $PORT
+     python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
      ```
 4. Scroll down to **Environment Variables** and add the following keys from your `.env`:
    - `GEMINI_API_KEY`
