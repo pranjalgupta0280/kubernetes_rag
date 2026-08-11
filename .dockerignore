@@ -1,0 +1,15 @@
+# Docker ignore list
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.git/
+.gitignore
+.logfire/
+scratch/
+.pytest_cache/
+.coverage
+htmlcov/
+*.log

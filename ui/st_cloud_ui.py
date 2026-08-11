@@ -38,7 +38,15 @@ with st.sidebar:
     st.title("🧠 Agent OS")
     st.markdown("---")
 
-    base_url = "http://localhost:8000"
+    def get_backend_url():
+        try:
+            if "BACKEND_URL" in st.secrets:
+                return st.secrets["BACKEND_URL"].rstrip("/")
+        except Exception:
+            pass
+        return os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
+
+    base_url = get_backend_url()
 
     st.markdown("---")
     st.success(f"Logfire: {LOGFIRE_STATUS}")

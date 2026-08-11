@@ -1,14 +1,12 @@
 from app.agents.state import AgentState
-from app.config import settings
-from langchain_groq import ChatGroq
+from app.gateway.client import get_langchain_llm
 import logfire
 
-# Portkey-backed LLM: fallback + cache + retry — same .invoke() interface as ChatGroq
-llm = ChatGroq(api_key=settings.GROQ_API_KEY, model=settings.GROQ_MODEL)
 
 def planner_node(state: AgentState):
     """
-    The Planner determines if a search is needed based on the ENTIRE conversation.
+    The Planner determines if a search is needed based on the ENTIRE conversation history.
+    Uses Portkey AI Gateway for LLM inference.
     """
     # Get the conversation history (excluding the latest message)
     history = ""
@@ -36,6 +34,7 @@ def planner_node(state: AgentState):
     """
     
     with logfire.span("🧠 Planner Decision"):
+        llm = get_langchain_llm(feature="planner", temperature=0.0)
         decision = llm.invoke(prompt).content.strip()
         logfire.info(f"Intent identified: {decision}")
     

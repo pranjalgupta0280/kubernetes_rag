@@ -1,0 +1,56 @@
+# ============================================================
+# Render Blueprint (render.yaml)
+# Enterprise Agentic RAG Multi-Service Architecture
+# ============================================================
+services:
+  # ----------------------------------------------------------
+  # 1. FastAPI Backend Web Service
+  # ----------------------------------------------------------
+  - type: web
+    name: enterprise-rag-api
+    env: python
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: LOGFIRE_TOKEN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: QDRANT_CLUSTER_ENDPOINT
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_FALLBACK_API_KEY
+        sync: false
+      - key: PORTKEY_API_KEY
+        sync: false
+      - key: LANGSMITH_TRACING
+        value: "true"
+      - key: LANGSMITH_API_KEY
+        sync: false
+      - key: LANGSMITH_PROJECT
+        value: "rag_scale_test"
+
+  # ----------------------------------------------------------
+  # 2. Streamlit UI Web Service
+  # ----------------------------------------------------------
+  - type: web
+    name: enterprise-rag-ui
+    env: python
+    buildCommand: pip install --upgrade pip && pip install streamlit requests python-dotenv logfire
+    startCommand: streamlit run ui/app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: LOGFIRE_TOKEN
+        sync: false
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: enterprise-rag-api
+          property: url

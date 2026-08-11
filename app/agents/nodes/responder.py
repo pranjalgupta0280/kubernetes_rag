@@ -1,12 +1,11 @@
 import logfire
 from app.agents.state import AgentState
-from app.config import settings
-from langchain_groq import ChatGroq
+from app.gateway.client import get_langchain_llm
 
 def generate_node(state: AgentState):
     """
     Synthesizes a response using both Documentation Context AND Conversation History.
-    Uses ChatGroq directly via LangChain (Gateway/Cache logic removed).
+    Routes LLM requests through Portkey AI Gateway for telemetry, fallback, and rate limiting.
     """
     query = state["current_query"]
 
@@ -62,14 +61,7 @@ def generate_node(state: AgentState):
 
     with logfire.span("✍️ LLM Synthesis"):
         try:
-            # Initialize ChatGroq using your config
-            llm = ChatGroq(
-                api_key=settings.GROQ_API_KEY, 
-                model_name="llama-3.3-70b-versatile", # Or pull this from settings if you have it
-                temperature=0.1
-            )
-            
-            # Use LangChain's invoke method
+            llm = get_langchain_llm(feature="responder", temperature=0.1)
             response = llm.invoke(prompt)
             content = response.content
 

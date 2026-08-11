@@ -24,6 +24,15 @@ except Exception as e:
     LOGFIRE_STATUS = f"Standby (Error: {e})"
     
 
+def get_backend_url():
+    """Dynamically determine FastAPI backend URL from Streamlit secrets or env vars."""
+    try:
+        if "BACKEND_URL" in st.secrets:
+            return st.secrets["BACKEND_URL"].rstrip("/")
+    except Exception:
+        pass
+    return os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
+
 
 # --- PAGE CONFIG ---
 st.set_page_config(
@@ -85,7 +94,7 @@ if prompt := st.chat_input("Ask about your documentation..."):
                 try:
                     # DISTRIBUTED TRACE: Calling Backend
                     with logfire.span("📡 Calling RAG Backend"):
-                        base_url = os.getenv("BACKEND_URL", "http://localhost:8000")
+                        base_url = get_backend_url()
                         url = f"{base_url}/query"
                         payload = {"q": prompt, "thread_id": st.session_state.session_id}
                         response = requests.post(url, json=payload, timeout=60)
