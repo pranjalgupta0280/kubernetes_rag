@@ -39,17 +39,25 @@ with st.sidebar:
     st.markdown("---")
 
     def get_backend_url():
+        url = None
         try:
             if "BACKEND_URL" in st.secrets:
-                return st.secrets["BACKEND_URL"].rstrip("/")
+                url = str(st.secrets["BACKEND_URL"]).strip()
         except Exception:
             pass
-        return os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
+        if not url:
+            url = os.getenv("BACKEND_URL", "http://localhost:8000").strip()
+        
+        url = url.rstrip("/")
+        if not url.startswith("http://") and not url.startswith("https://"):
+            url = f"https://{url}"
+        return url
 
     base_url = get_backend_url()
 
     st.markdown("---")
     st.success(f"Logfire: {LOGFIRE_STATUS}")
+    st.caption(f"Backend API: `{base_url}`")
     st.info(f"Memory ID: {st.session_state.session_id[:8]}")
     
     if st.button("🗑️ Clear History & Memory", use_container_width=True, type="primary"):

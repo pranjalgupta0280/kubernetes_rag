@@ -26,12 +26,19 @@ except Exception as e:
 
 def get_backend_url():
     """Dynamically determine FastAPI backend URL from Streamlit secrets or env vars."""
+    url = None
     try:
         if "BACKEND_URL" in st.secrets:
-            return st.secrets["BACKEND_URL"].rstrip("/")
+            url = str(st.secrets["BACKEND_URL"]).strip()
     except Exception:
         pass
-    return os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
+    if not url:
+        url = os.getenv("BACKEND_URL", "http://localhost:8000").strip()
+    
+    url = url.rstrip("/")
+    if not url.startswith("http://") and not url.startswith("https://"):
+        url = f"https://{url}"
+    return url
 
 
 # --- PAGE CONFIG ---
