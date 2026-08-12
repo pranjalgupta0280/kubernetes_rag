@@ -15,10 +15,14 @@ _rails: LLMRails | None = None
 def initialize_rails() -> None:
     """
     Build the NeMo LLMRails singleton at app startup.
-    Uses llama-3.1-8b-instant for fast intent classification at the gate —
-    the heavier llama-3.3-70b-versatile is reserved for the RAG pipeline.
+    Can be bypassed via DISABLE_NEMO_GUARD=true to conserve memory on free tiers.
     """
     global _rails
+
+    if os.getenv("DISABLE_NEMO_GUARD", "false").lower() == "true":
+        logfire.info("ℹ️ NeMo Guardrails bypassed via DISABLE_NEMO_GUARD env flag.")
+        _rails = None
+        return
 
     try:
         guard_llm = ChatGroq(
@@ -35,7 +39,7 @@ def initialize_rails() -> None:
         _rails = LLMRails(config, llm=guard_llm)
         logfire.info("🛡️ NeMo Guardrails initialised (llama-3.1-8b-instant).")
     except Exception as e:
-        logfire.error(f"❌ NeMo Guardrails initialization error: {e}")
+        logfire.warning(f"⚠️ NeMo Guardrails initialization skipped/failed: {e}")
         _rails = None
 
 
