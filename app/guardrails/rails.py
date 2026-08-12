@@ -70,7 +70,8 @@ async def guard(message: str) -> tuple[bool, str | None]:
 
     with logfire.span("🛡️ Guardrails Check"):
         try:
-            result = await _rails.generate_async(messages=[{"role": "user", "content": message}])
+            import asyncio
+            result = await asyncio.to_thread(_rails.generate, messages=[{"role": "user", "content": message}])
 
             # NeMo returns {'role': 'assistant', 'content': '...'} — extract text
             if isinstance(result, dict):
@@ -90,6 +91,7 @@ async def guard(message: str) -> tuple[bool, str | None]:
             return False, None
         except Exception as e:
             logfire.error(f"❌ Guardrail execution error: {e}")
-            if any(kw in msg_lower for kw in OFF_TOPIC_KEYWORDS):
-                return True, "I'm an Enterprise IT Assistant focused on Kubernetes, Intel hardware, and networking. I can't help with that — but ask me anything technical!"
+            return False, None
+        except BaseException as b_err:
+            logfire.error(f"❌ Critical Guardrail error bypassed: {b_err}")
             return False, None
