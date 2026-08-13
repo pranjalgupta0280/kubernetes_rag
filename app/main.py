@@ -121,8 +121,9 @@ async def query(request: QueryRequest):
             }
 
         # Gate 2: LangGraph RAG pipeline
-        # Run the graph synchronously to preserve Logfire context variables
-        final_output = rag_agent.invoke(initial_state, config=config)
+        # Run graph in thread pool so Uvicorn event loop stays 100% non-blocking
+        import asyncio
+        final_output = await asyncio.to_thread(rag_agent.invoke, initial_state, config=config)
         
         return {
             "question": q,
