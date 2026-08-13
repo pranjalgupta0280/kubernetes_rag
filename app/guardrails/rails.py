@@ -68,8 +68,14 @@ async def guard(message: str) -> tuple[bool, str | None]:
         logfire.info(f"🛡️ Guardrails fired (keyword match) | query='{message[:80]}'")
         return True, "I'm an Enterprise IT Assistant focused on Kubernetes, Intel hardware, and networking. I can't help with that — but ask me anything technical!"
 
+    if _rails is None and os.getenv("DISABLE_NEMO_GUARD", "false").lower() != "true":
+        try:
+            initialize_rails()
+        except Exception:
+            pass
+
     if _rails is None:
-        logfire.warning("⚠️ Guardrails not initialised — passing through.")
+        logfire.info("⚠️ Guardrails uninitialized/bypassed — passing through.")
         return False, None
 
     with logfire.span("🛡️ Guardrails Check"):

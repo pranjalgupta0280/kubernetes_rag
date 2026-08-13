@@ -38,11 +38,7 @@ from typing import Optional
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logfire.info("🚀 Starting Enterprise RAG API - initializing NeMo Guardrails...")
-    try:
-        initialize_rails()
-    except Exception as e:
-        logfire.error(f"❌ Guardrails initialization error: {e}")
+    logfire.info("🚀 Starting Enterprise RAG API...")
     yield
     logfire.info("🛑 Shutting down Enterprise RAG API...")
 
