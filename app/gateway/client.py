@@ -7,9 +7,9 @@ from langchain_groq import ChatGroq
 from app.config import settings
 
 
-def get_langchain_llm(feature: str = "rag", temperature: float = 0.0):
+def get_langchain_llm(feature: str = "rag", temperature: float = 0.0, model_name: str = "llama-3.3-70b-versatile"):
     """
-    Returns ChatGroq directly for lightning-fast latency (~1-2s).
+    Returns ChatGroq directly for sub-second classification and ultra-fast RAG latency.
     Can be optionally routed through Portkey AI Gateway when USE_PORTKEY_GATEWAY=true.
     """
     use_portkey = os.getenv("USE_PORTKEY_GATEWAY", "false").lower() == "true"
@@ -25,22 +25,22 @@ def get_langchain_llm(feature: str = "rag", temperature: float = 0.0):
                     "environment": "production"
                 }
             )
-            logfire.info(f"🌐 Initializing Portkey AI Gateway LLM | feature={feature}")
+            logfire.info(f"🌐 Initializing Portkey AI Gateway LLM | feature={feature} model={model_name}")
             return ChatOpenAI(
                 api_key=portkey_key,
                 base_url=PORTKEY_GATEWAY_URL,
-                model="@groq/llama-3.3-70b-versatile",
+                model=f"@groq/{model_name}",
                 temperature=temperature,
                 default_headers=headers,
-                request_timeout=25
+                request_timeout=20
             )
         except Exception as e:
             logfire.warning(f"⚠️ Portkey Gateway initialization error: {e}. Falling back to direct ChatGroq.")
     
-    logfire.info(f"⚡ Using direct ChatGroq client (llama-3.3-70b-versatile) | feature={feature}")
+    logfire.info(f"⚡ Using direct ChatGroq client ({model_name}) | feature={feature}")
     return ChatGroq(
         api_key=settings.GROQ_API_KEY,
-        model_name="llama-3.3-70b-versatile",
+        model_name=model_name,
         temperature=temperature,
-        request_timeout=25
+        request_timeout=20
     )
