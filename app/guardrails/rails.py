@@ -15,12 +15,13 @@ _rails: LLMRails | None = None
 def initialize_rails() -> None:
     """
     Build the NeMo LLMRails singleton at app startup.
-    Can be bypassed via DISABLE_NEMO_GUARD=true to conserve memory on free tiers.
+    Defaulted to bypassed on cloud hosting environments to keep memory under 50 MB.
     """
     global _rails
 
-    if os.getenv("DISABLE_NEMO_GUARD", "false").lower() == "true":
-        logfire.info("ℹ️ NeMo Guardrails bypassed via DISABLE_NEMO_GUARD env flag.")
+    disable_nemo = os.getenv("DISABLE_NEMO_GUARD", "true").lower() == "true"
+    if disable_nemo:
+        logfire.info("ℹ️ NeMo Guardrails bypassed to conserve memory on cloud hosting tier.")
         _rails = None
         return
 
