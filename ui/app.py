@@ -223,7 +223,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 🌐 Live Architecture Graph")
     with st.expander("👁️ View Agent State Machine"):
-        st.image(f"{base_url}/graph", caption="LangGraph Workflow Pipeline", use_container_width=True)
+        st.image(f"{base_url}/graph", caption="LangGraph Workflow Pipeline", use_column_width=True)
 
 # --- HERO HEADER ---
 st.markdown("""

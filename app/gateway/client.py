@@ -5,7 +5,7 @@ from langchain_groq import ChatGroq
 from app.config import settings
 
 
-def get_langchain_llm(feature: str = "rag", temperature: float = 0.0, model_name: str = "openai/gpt-oss-120b"):
+def get_langchain_llm(feature: str = "rag", temperature: float = 0.0, model_name: str = "openai/gpt-oss-120b", max_tokens: int = 512):
     """
     Returns ChatGroq directly for sub-second classification and ultra-fast RAG latency.
     Can be optionally routed through Portkey AI Gateway when USE_PORTKEY_GATEWAY=true.
@@ -31,6 +31,7 @@ def get_langchain_llm(feature: str = "rag", temperature: float = 0.0, model_name
                 base_url=PORTKEY_GATEWAY_URL,
                 model=f"@groq/{model_name}",
                 temperature=temperature,
+                max_tokens=max_tokens,
                 default_headers=headers,
                 request_timeout=20
             )
@@ -42,5 +43,6 @@ def get_langchain_llm(feature: str = "rag", temperature: float = 0.0, model_name
         api_key=settings.GROQ_API_KEY,
         model_name=model_name,
         temperature=temperature,
+        max_tokens=max_tokens,
         request_timeout=20
     )

@@ -49,6 +49,11 @@ def generate_node(state: AgentState):
         You are a Senior Technical Architect.
         Answer the question using the TECHNICAL CONTEXT provided.
 
+        CRITICAL INSTRUCTIONS:
+        - Keep your response CONCISE, CLEAR, and TO THE POINT.
+        - Use short bullet points where appropriate.
+        - Do NOT write long verbose introductions or unnecessary fluff.
+
         TECHNICAL CONTEXT:
         {full_context}
 
@@ -62,7 +67,7 @@ def generate_node(state: AgentState):
     with logfire.span("✍️ LLM Synthesis"):
         try:
             model = "openai/gpt-oss-20b" if query == "CONVERSATIONAL" else "openai/gpt-oss-120b"
-            llm = get_langchain_llm(feature="responder", temperature=0.1, model_name=model)
+            llm = get_langchain_llm(feature="responder", temperature=0.1, model_name=model, max_tokens=350)
             response = llm.invoke(prompt)
             content = response.content
 
