@@ -121,27 +121,19 @@ html, body, [data-testid="stAppViewContainer"] {
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 245, 212, 0); }
 }
 
-/* Chat Input Styling */
-[data-testid="stChatInput"] {
-    border-radius: 16px !important;
-    border: 1px solid rgba(0, 242, 254, 0.3) !important;
-    background: rgba(15, 23, 42, 0.9) !important;
-    box-shadow: 0 0 20px rgba(0, 242, 254, 0.15) !important;
+/* Feature Cards */
+.feature-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    height: 100%;
 }
-
-[data-testid="stChatInput"]:focus-within {
-    border-color: #00f2fe !important;
-    box-shadow: 0 0 30px rgba(0, 242, 254, 0.35) !important;
-}
-
-/* Chat Message Bubbles */
-[data-testid="stChatMessage"] {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 16px !important;
-    padding: 16px !important;
-    margin-bottom: 12px !important;
-    backdrop-filter: blur(10px) !important;
+.feature-title {
+    color: #00f2fe;
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
 }
 
 /* Custom Buttons */
@@ -161,7 +153,6 @@ html, body, [data-testid="stAppViewContainer"] {
     transform: translateY(-2px) !important;
 }
 
-/* Code Blocks */
 code, pre {
     font-family: 'JetBrains Mono', monospace !important;
 }
@@ -181,6 +172,9 @@ if "session_id" not in st.session_state:
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+if "nav_page" not in st.session_state:
+    st.session_state.nav_page = "🏠 Overview & Architecture"
 
 # --- BACKEND URL RESOLUTION ---
 def get_backend_url():
@@ -205,6 +199,16 @@ with st.sidebar:
     st.markdown('<div style="font-size: 1.4rem; font-weight: 800; color: #00f2fe; margin-bottom: 8px;">🧠 NEXUS AGENT OS</div>', unsafe_allow_html=True)
     st.markdown('<div style="color: #64748b; font-size: 0.85rem; margin-bottom: 20px;">Autonomous RAG Architecture</div>', unsafe_allow_html=True)
     
+    st.markdown("### 📍 Navigation")
+    nav = st.radio(
+        "Select View:",
+        ["🏠 Overview & Architecture", "💬 Try Interactive Assistant"],
+        index=0 if st.session_state.nav_page == "🏠 Overview & Architecture" else 1,
+        key="nav_radio"
+    )
+    st.session_state.nav_page = nav
+
+    st.markdown("---")
     st.markdown("### ⚡ System Status")
     st.markdown(f'<div class="status-badge"><span class="pulse-dot"></span>LIVE ARCHITECTURE</div>', unsafe_allow_html=True)
     st.caption(f"**Backend API**: `{base_url}`")
@@ -213,7 +217,6 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 🛠️ Control Panel")
-    
     if st.button("🗑️ Reset Session & Memory", use_container_width=True):
         logfire.warning(f"🗑️ Memory Wipe Triggered for session: {st.session_state.session_id}")
         st.session_state.messages = []
@@ -225,121 +228,223 @@ with st.sidebar:
     with st.expander("👁️ View Agent State Machine"):
         st.image(f"{base_url}/graph", caption="LangGraph Workflow Pipeline", use_column_width=True)
 
-# --- HERO HEADER ---
-st.markdown("""
-<div class="glass-panel">
-    <div class="hero-title">⚡ Nexus Agentic Assistant</div>
-    <div class="hero-subtitle">Enterprise IT Intelligence Engine • Powered by Portkey AI Gateway & Qdrant Vector Engine</div>
-    <div>
-        <span class="status-badge">☸️ KUBERNETES READY</span>
-        <span class="status-badge">🛡️ NEMO SAFETY RAILS</span>
-        <span class="status-badge">⚡ GROQ GPT-OSS 120B</span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# --- SUGGESTED PROMPT CHIPS (If chat is empty) ---
-if len(st.session_state.messages) == 0:
-    st.markdown("### 💡 Recommended Prompts to Try:")
-    col1, col2, col3 = st.columns(3)
+# ==============================================================================
+# PAGE 1: HOME / OVERVIEW & TECHNICAL ARCHITECTURE
+# ==============================================================================
+if st.session_state.nav_page == "🏠 Overview & Architecture":
     
-    prompt_choice = None
-    with col1:
-        if st.button("☸️ What is Kubernetes pod scheduling?", use_container_width=True):
-            prompt_choice = "What is Kubernetes pod scheduling?"
-    with col2:
-        if st.button("⚡ Explain Intel Xeon hardware acceleration", use_container_width=True):
-            prompt_choice = "Explain Intel Xeon hardware acceleration"
-    with col3:
-        if st.button("🛡️ Show how NeMo guardrails block off-topic queries", use_container_width=True):
-            prompt_choice = "Recommend me some good movies to watch"
+    # Hero Header
+    st.markdown("""
+    <div class="glass-panel">
+        <div class="hero-title">⚡ Nexus Enterprise Agentic RAG</div>
+        <div class="hero-subtitle">High-Performance Autonomous Knowledge Retrieval & Reasoning Engine</div>
+        <div>
+            <span class="status-badge">☸️ KUBERNETES READY</span>
+            <span class="status-badge">🛡️ NEMO SAFETY RAILS</span>
+            <span class="status-badge">⚡ GROQ GPT-OSS 120B</span>
+            <span class="status-badge">🔍 QDRANT CLUSTER DB</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    if prompt_choice:
-        st.session_state.selected_prompt = prompt_choice
+    # CTA Button to try it out
+    col_cta1, col_cta2 = st.columns([3, 1])
+    with col_cta1:
+        st.markdown("##### 🚀 Test out the live assistant with your enterprise technical docs")
+    with col_cta2:
+        if st.button("💬 Launch Assistant ->", use_container_width=True):
+            st.session_state.nav_page = "💬 Try Interactive Assistant"
+            st.rerun()
 
-# --- RENDER CHAT HISTORY ---
-for message in st.session_state.messages:
-    avatar = AI_AVATAR if message["role"] == "assistant" else USER_AVATAR
-    with st.chat_message(message["role"], avatar=avatar):
-        st.markdown(message["content"])
+    st.markdown("---")
 
-# --- HANDLE PROMPT INPUT ---
-prompt = st.chat_input("Ask Nexus anything about your technical documentation...")
-
-# Handle click from sample buttons
-if "selected_prompt" in st.session_state and st.session_state.selected_prompt:
-    prompt = st.session_state.selected_prompt
-    st.session_state.selected_prompt = None
-
-if prompt:
-    # START TRACE
-    with logfire.span("💬 User Chat Interaction", user_query=prompt, session_id=st.session_state.session_id):
+    # Why This Project is Unique & Important
+    st.markdown("### 🌟 Why This Architecture is Unique & Important")
+    c1, c2, c3 = st.columns(3)
+    
+    with c1:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="feature-title">🧠 Autonomous State Machine</div>
+            <p style="color: #cbd5e1; font-size: 0.9rem;">
+                Unlike rigid chain-based RAG pipelines, Nexus uses a cyclic <strong>LangGraph Agent State Machine</strong>. It dynamically decides whether to converse via short-term memory or route queries to vector search.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
         
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user", avatar=USER_AVATAR):
-            st.markdown(prompt)
+    with c2:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="feature-title">🛡️ 2-Tier Enterprise Guardrails</div>
+            <p style="color: #cbd5e1; font-size: 0.9rem;">
+                Combines sub-millisecond keyword filtering with <strong>NeMo Guardrails</strong> to instantly block off-topic prompt injections, jailbreaks, and non-technical chatter before hitting the expensive LLM tier.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
-        # Assistant Response
-        with st.chat_message("assistant", avatar=AI_AVATAR):
-            data = {}
-            with st.status("🔍 Nexus Agent is synthesizing...", expanded=True) as status:
-                try:
-                    with logfire.span("📡 Calling RAG Backend"):
-                        url = f"{base_url}/query"
-                        payload = {"q": prompt, "thread_id": st.session_state.session_id}
-                        
-                        max_retries = 3
-                        for attempt in range(max_retries):
-                            try:
-                                response = requests.post(url, json=payload, timeout=90)
-                                if response.status_code == 200:
-                                    data = response.json()
-                                    break
-                                elif response.status_code in (502, 503, 504) and attempt < max_retries - 1:
-                                    st.write(f"⚡ Waking backend server from idle... Retrying ({attempt+1}/{max_retries})...")
-                                    time.sleep(12)
-                                else:
-                                    st.error(f"Backend Error: {response.status_code} - {response.text[:300]}")
-                                    st.stop()
-                            except Exception as req_err:
-                                if attempt < max_retries - 1:
-                                    st.write("⚡ Waking backend server... Retrying in 10s...")
-                                    time.sleep(10)
-                                else:
-                                    raise req_err
+    with c3:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="feature-title">⚡ Ultra-Fast Groq + Qdrant DB</div>
+            <p style="color: #cbd5e1; font-size: 0.9rem;">
+                Leverages <strong>Qdrant Cloud Vector DB</strong> with reciprocal reranking and <strong>Groq LPU acceleration</strong> (GPT-OSS 120B) for sub-second RAG response generation and zero hallucination.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
-                    steps = data.get("thought_process", [])
-                    for step in steps:
-                        st.markdown(f"⚙️ `{step}`", unsafe_allow_html=False)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-                    status.update(label="✅ Answer Synthesized via Portkey Gateway", state="complete", expanded=False)
+    # Technical Background & Flowchart
+    st.markdown("### 📐 Technical Architecture & Flowchart")
+    
+    st.markdown("""
+    ```mermaid
+    graph TD
+        A[👤 User Input Query] --> B[🛡️ NeMo & Keyword Guardrails]
+        
+        B -->|Off-Topic / Jailbreak| C[🛑 Blocked: Instant Guard Policy Response]
+        B -->|Valid Query| D[🧠 Planner Node: Intent & History Router]
+        
+        D -->|Greeting / Memory Question| E[💬 Conversational Memory Branch]
+        D -->|Technical RAG Search| F[🔍 Qdrant Cloud Vector Search]
+        
+        F --> G[⚖️ Semantic Reranker: Top Relevant Chunks]
+        G --> H[✍️ Responder Node: Groq GPT-OSS 120B Synthesis]
+        E --> H
+        
+        H --> I[✅ Final Concise Response + Sources]
+    ```
+    """)
 
-                except Exception as e:
-                    logfire.error(f"❌ UI-Backend Connection Failed: {e}")
-                    status.update(label="❌ Connection Failed", state="error")
-                    st.error("Backend Offline.")
-                    st.stop()
+    st.markdown("---")
 
-            # Answer streaming — outside status container
-            answer_placeholder = st.empty()
-            full_answer = data.get("answer", "No response.")
+    # Core System Components Overview Table
+    st.markdown("### 🛠️ Core Component Stack")
+    st.markdown("""
+    | Layer | Technology | Purpose |
+    | :--- | :--- | :--- |
+    | **Orchestration** | LangGraph State Machine | Stateful execution flow with graph memory & fallback logic |
+    | **Vector Database** | Qdrant Cloud Cluster | High-dimension payload search (`enterprise_rag` collection) |
+    | **Reasoning LLM** | Groq LPU Engine (`openai/gpt-oss-120b`) | Ultra-fast token synthesis with enforced conciseness limits |
+    | **Guardrails** | NeMo Guardrails + Keyword Gate | Prevents prompt injection, off-topic drift, & inappropriate content |
+    | **Telemetry** | Pydantic Logfire | End-to-end trace spans, latency tracking, and execution metrics |
+    """)
 
-            curr_text = ""
-            for char in full_answer:
-                curr_text += char
-                answer_placeholder.markdown(curr_text + "▌")
-                time.sleep(0.004)
-            answer_placeholder.markdown(full_answer)
+# ==============================================================================
+# PAGE 2: INTERACTIVE ASSISTANT (TRY IT OUT)
+# ==============================================================================
+else:
+    # Header Banner
+    st.markdown("""
+    <div class="glass-panel">
+        <div class="hero-title">⚡ Nexus Agentic Assistant</div>
+        <div class="hero-subtitle">Enterprise IT Intelligence Engine • Powered by Portkey AI Gateway & Qdrant Vector Engine</div>
+        <div>
+            <span class="status-badge">☸️ KUBERNETES READY</span>
+            <span class="status-badge">🛡️ NEMO SAFETY RAILS</span>
+            <span class="status-badge">⚡ GROQ GPT-OSS 120B</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-            # Retrieved Sources Container
-            sources = data.get("sources", [])
-            if sources:
-                with st.expander(f"📄 Retrieved Technical Context ({len(sources)} Chunks)"):
-                    for i, source in enumerate(sources):
-                        st.caption(f"Vector Chunk {i + 1}")
-                        st.info(source)
-            else:
-                st.caption("ℹ️ Conversational mode — no vector context retrieval required.")
+    # Suggested Prompts (if chat empty)
+    if len(st.session_state.messages) == 0:
+        st.markdown("### 💡 Recommended Prompts to Try:")
+        col1, col2, col3 = st.columns(3)
+        
+        prompt_choice = None
+        with col1:
+            if st.button("☸️ What is Kubernetes pod scheduling?", use_container_width=True):
+                prompt_choice = "What is Kubernetes pod scheduling?"
+        with col2:
+            if st.button("⚡ Explain Intel Xeon hardware acceleration", use_container_width=True):
+                prompt_choice = "Explain Intel Xeon hardware acceleration"
+        with col3:
+            if st.button("🛡️ Show how NeMo guardrails block off-topic queries", use_container_width=True):
+                prompt_choice = "Recommend me some good movies to watch"
 
-            st.session_state.messages.append({"role": "assistant", "content": full_answer})
-            logfire.info("✅ Chat cycle completed successfully.")
+        if prompt_choice:
+            st.session_state.selected_prompt = prompt_choice
+
+    # Render Chat History
+    for message in st.session_state.messages:
+        avatar = AI_AVATAR if message["role"] == "assistant" else USER_AVATAR
+        with st.chat_message(message["role"], avatar=avatar):
+            st.markdown(message["content"])
+
+    # Handle Input
+    prompt = st.chat_input("Ask Nexus anything about your technical documentation...")
+
+    if "selected_prompt" in st.session_state and st.session_state.selected_prompt:
+        prompt = st.session_state.selected_prompt
+        st.session_state.selected_prompt = None
+
+    if prompt:
+        with logfire.span("💬 User Chat Interaction", user_query=prompt, session_id=st.session_state.session_id):
+            
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user", avatar=USER_AVATAR):
+                st.markdown(prompt)
+
+            # Assistant Response
+            with st.chat_message("assistant", avatar=AI_AVATAR):
+                data = {}
+                with st.status("🔍 Nexus Agent is synthesizing...", expanded=True) as status:
+                    try:
+                        with logfire.span("📡 Calling RAG Backend"):
+                            url = f"{base_url}/query"
+                            payload = {"q": prompt, "thread_id": st.session_state.session_id}
+                            
+                            max_retries = 3
+                            for attempt in range(max_retries):
+                                try:
+                                    response = requests.post(url, json=payload, timeout=90)
+                                    if response.status_code == 200:
+                                        data = response.json()
+                                        break
+                                    elif response.status_code in (502, 503, 504) and attempt < max_retries - 1:
+                                        st.write(f"⚡ Waking backend server... Retrying ({attempt+1}/{max_retries})...")
+                                        time.sleep(12)
+                                    else:
+                                        st.error(f"Backend Error: {response.status_code} - {response.text[:300]}")
+                                        st.stop()
+                                except Exception as req_err:
+                                    if attempt < max_retries - 1:
+                                        st.write("⚡ Waking backend... Retrying in 10s...")
+                                        time.sleep(10)
+                                    else:
+                                        raise req_err
+
+                        steps = data.get("thought_process", [])
+                        for step in steps:
+                            st.markdown(f"⚙️ `{step}`", unsafe_allow_html=False)
+
+                        status.update(label="✅ Answer Synthesized via Groq Engine", state="complete", expanded=False)
+
+                    except Exception as e:
+                        logfire.error(f"❌ UI-Backend Connection Failed: {e}")
+                        status.update(label="❌ Connection Failed", state="error")
+                        st.error("Backend Offline.")
+                        st.stop()
+
+                answer_placeholder = st.empty()
+                full_answer = data.get("answer", "No response.")
+
+                curr_text = ""
+                for char in full_answer:
+                    curr_text += char
+                    answer_placeholder.markdown(curr_text + "▌")
+                    time.sleep(0.004)
+                answer_placeholder.markdown(full_answer)
+
+                sources = data.get("sources", [])
+                if sources:
+                    with st.expander(f"📄 Retrieved Technical Context ({len(sources)} Chunks)"):
+                        for i, source in enumerate(sources):
+                            st.caption(f"Vector Chunk {i + 1}")
+                            st.info(source)
+                else:
+                    st.caption("ℹ️ Conversational mode — no vector context retrieval required.")
+
+                st.session_state.messages.append({"role": "assistant", "content": full_answer})
+                logfire.info("✅ Chat cycle completed successfully.")

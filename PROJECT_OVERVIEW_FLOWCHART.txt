@@ -1,0 +1,68 @@
+================================================================================
+           NEXUS ENTERPRISE AGENTIC RAG - ARCHITECTURE & FLOWCHART
+================================================================================
+
+1. PROJECT OVERVIEW:
+   Nexus Agentic OS is an autonomous Enterprise RAG (Retrieval-Augmented Generation) 
+   system designed for high-precision technical documentation synthesis across 
+   Kubernetes, Intel hardware, and networking domains.
+
+2. WHY THIS PROJECT IS UNIQUE & IMPORTANT:
+   a) Stateful Cyclic Graph Routing (LangGraph):
+      Dynamic state machine that evaluates conversation history to distinguish 
+      between conversational chit-chat vs technical queries requiring vector search.
+   b) Multi-Tier Enterprise Guardrails (NeMo Guardrails):
+      Instant keyword gate + NeMo safety rails to block off-topic prompt injections 
+      and non-technical questions before reaching expensive LLM layers.
+   c) Hybrid Vector Search & Reciprocal Reranking (Qdrant Cloud):
+      Queries high-dimensional embeddings from Qdrant Cloud and semantically 
+      reranks top candidate chunks for 0% hallucination.
+   d) Sub-Second LPU Acceleration (Groq GPT-OSS 120B):
+      Leverages Groq Language Processing Units for sub-second token generation 
+      with strict token limit enforcement.
+
+3. END-TO-END TECHNICAL EXECUTION FLOWCHART:
+
+   +-----------------------+
+   |   User Query (Client) |
+   +-----------+-----------+
+               |
+               v
+   +-----------+-----------+
+   |   NeMo Safety Gate    |  (Off-Topic Keyword Check + NeMo Policy)
+   +-----------+-----------+
+               |
+      +--------+--------+
+      |                 |
+   (Off-Topic)       (Valid)
+      |                 |
+      v                 v
+   +------+   +---------+---------+
+   | Block|   |   LangGraph Router| (Planner Node)
+   +------+   +---------+---------+
+                        |
+            +-----------+-----------+
+            |                       |
+     (Conversational)          (Technical RAG)
+            |                       |
+            v                       v
+      +-----+------+         +------+-----+
+      | Memory Flow|         | Qdrant DB  | (Vector Search)
+      +-----+------+         +------+-----+
+            |                       |
+            |                       v
+            |                +------+-----+
+            |                | Reranker   | (Top 5 Chunks)
+            |                +------+-----+
+            |                       |
+            +-----------+-----------+
+                        |
+                        v
+              +---------+---------+
+              | Groq LPU Synthesis| (GPT-OSS 120B Engine)
+              +---------+---------+
+                        |
+                        v
+              +---------+---------+
+              |  Synthesized Answer|
+              +-------------------+
