@@ -1,13 +1,11 @@
 import os
 import logfire
-from portkey_ai import createHeaders, PORTKEY_GATEWAY_URL
-from langchain_openai import ChatOpenAI
 from langchain_groq import ChatGroq
 
 from app.config import settings
 
 
-def get_langchain_llm(feature: str = "rag", temperature: float = 0.0, model_name: str = "llama-3.3-70b-versatile"):
+def get_langchain_llm(feature: str = "rag", temperature: float = 0.0, model_name: str = "openai/gpt-oss-120b"):
     """
     Returns ChatGroq directly for sub-second classification and ultra-fast RAG latency.
     Can be optionally routed through Portkey AI Gateway when USE_PORTKEY_GATEWAY=true.
@@ -17,6 +15,8 @@ def get_langchain_llm(feature: str = "rag", temperature: float = 0.0, model_name
     
     if use_portkey and portkey_key:
         try:
+            from portkey_ai import createHeaders, PORTKEY_GATEWAY_URL
+            from langchain_openai import ChatOpenAI
             headers = createHeaders(
                 api_key=portkey_key,
                 metadata={

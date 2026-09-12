@@ -233,7 +233,7 @@ st.markdown("""
     <div>
         <span class="status-badge">☸️ KUBERNETES READY</span>
         <span class="status-badge">🛡️ NEMO SAFETY RAILS</span>
-        <span class="status-badge">⚡ GROQ LLAMA 3.3 70B</span>
+        <span class="status-badge">⚡ GROQ GPT-OSS 120B</span>
     </div>
 </div>
 """, unsafe_allow_html=True)

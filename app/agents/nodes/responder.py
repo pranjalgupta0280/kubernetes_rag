@@ -61,7 +61,7 @@ def generate_node(state: AgentState):
 
     with logfire.span("✍️ LLM Synthesis"):
         try:
-            model = "llama-3.1-8b-instant" if query == "CONVERSATIONAL" else "llama-3.3-70b-versatile"
+            model = "openai/gpt-oss-20b" if query == "CONVERSATIONAL" else "openai/gpt-oss-120b"
             llm = get_langchain_llm(feature="responder", temperature=0.1, model_name=model)
             response = llm.invoke(prompt)
             content = response.content

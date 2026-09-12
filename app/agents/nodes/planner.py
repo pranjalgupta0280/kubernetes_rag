@@ -34,7 +34,7 @@ def planner_node(state: AgentState):
     """
     
     with logfire.span("🧠 Planner Decision"):
-        llm = get_langchain_llm(feature="planner", temperature=0.0, model_name="llama-3.1-8b-instant")
+        llm = get_langchain_llm(feature="planner", temperature=0.0, model_name="openai/gpt-oss-20b")
         decision = llm.invoke(prompt).content.strip()
         logfire.info(f"Intent identified: {decision}")
     

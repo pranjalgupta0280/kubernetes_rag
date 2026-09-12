@@ -1,0 +1,46 @@
+================================================================================
+                         CHANGES & ARCHITECTURE FLOWCHART
+================================================================================
+
+1. GROQ API KEY UPDATE:
+   - Configured new Groq API key in .env: 
+
+2. BUG FIXES & MODEL COMPATIBILITY:
+   a) Model Migration & 404 Resolution:
+      - Migrated from decommissioned `llama-3.3-70b-versatile` / `llama-3.1-8b-instant` to active models on your Groq tier:
+        * Reasoning / Synthesis: `openai/gpt-oss-120b`
+        * Fast Intent / Guardrails: `openai/gpt-oss-20b`
+   b) Portkey Gateway Import Fallback:
+      - Fixed `ModuleNotFoundError` for `portkey_ai` in `app/gateway/client.py`.
+      - Wrapped `portkey_ai` inside conditional import block to allow smooth execution with direct ChatGroq.
+   c) Python Package Structure Fix:
+      - Corrected `_init_.py` naming to standard `__init__.py` across all package modules (`app/`, `app/services/`, `app/ingestion/`, `app/agents/`, etc.).
+
+3. SYSTEM FLOWCHART:
+   
+   +-----------------------+
+   |   User Query (Client) |
+   +-----------+-----------+
+               |
+               v
+   +-----------+-----------+
+   |   NeMo Guardrails Gate| (gpt-oss-20b / Keyword Check)
+   +-----------+-----------+
+               | (Pass)
+               v
+   +-----------+-----------+
+   |   LangGraph RAG Engine|
+   +-----------+-----------+
+               |
+               +---> [Planner Node] (gpt-oss-20b Intent Router)
+               |
+               +---> [Qdrant Vector DB] (Vector Retrieval)
+               |
+               +---> [Responder Node] (gpt-oss-120b Synthesis)
+                     ^
+                     | (New API Key: gsk_oRio...)
+               |
+               v
+   +-----------+-----------+
+   |  Synthesized Answer   |
+   +-----------------------+
