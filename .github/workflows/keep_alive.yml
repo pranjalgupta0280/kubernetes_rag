@@ -1,0 +1,15 @@
+name: Keep Streamlit Alive
+
+on:
+  schedule:
+    # Runs every 5 days at 00:00 UTC (Streamlit sleeps after 7 days of inactivity)
+    - cron: '0 0 */5 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Streamlit App
+        run: |
+          curl -sS https://kubernetesrag-pranjal.streamlit.app/ > /dev/null
